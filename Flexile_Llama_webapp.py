@@ -18,7 +18,8 @@
 # 1. Host the app on Streamlit Cloud for easy web access.
 # 2. Ensure responsive design for mobile and desktop devices.
 # 3. Add username-based identification to isolate data per user.
-# 4. Prepare for TRN API integration to automate data fetching.
+# 4. Restore CSV upload functionality for bulk data entry.
+# 5. Add a logout button near the top right for improved user experience.
 
 # Modules to Explore:
 # - Pandas for analytics
@@ -44,6 +45,7 @@ username = st.sidebar.text_input("Enter your username to continue:", key="userna
 
 if username:
     st.sidebar.success(f"Welcome, {username}!")
+    st.sidebar.button("Logout", key="logout_button", help="Click to log out", on_click=lambda: st.experimental_rerun())
 
     # Connect to a user-specific database
     conn = sqlite3.connect(f"{username}_flexile_llama.db")  # Unique database per user
@@ -79,6 +81,28 @@ if username:
             cursor.execute('INSERT INTO matches (mode, kills, score, match_date) VALUES (?, ?, ?, ?)', (mode, kills, score, str(match_date)))
             conn.commit()
             st.success("Match data has been successfully added to Flexile Llama!")
+
+    # Upload a CSV File to Add Match Data in Bulk
+    st.subheader("Upload Match Data in Bulk")
+    uploaded_file = st.file_uploader("Choose a CSV file to upload", type=["csv"], key="csv_upload_button")
+
+    if uploaded_file is not None:
+        try:
+            # Read the uploaded CSV file
+            bulk_data = pd.read_csv(uploaded_file)
+
+            # Check for required columns
+            required_columns = {"mode", "kills", "score", "match_date"}
+            if required_columns.issubset(bulk_data.columns):
+                for _, row in bulk_data.iterrows():
+                    cursor.execute('INSERT INTO matches (mode, kills, score, match_date) VALUES (?, ?, ?, ?)',
+                                   (row['mode'], row['kills'], row['score'], row['match_date']))
+                conn.commit()
+                st.success("CSV data uploaded successfully!")
+            else:
+                st.error(f"CSV must include the following columns: {', '.join(required_columns)}")
+        except Exception as e:
+            st.error(f"Error processing CSV: {e}")
 
     # Display Saved Data
     st.subheader("Saved Match Data")

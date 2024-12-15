@@ -30,9 +30,15 @@ st.title("Flexile Llama Performance Tracker")
 st.markdown("### Track your Fortnite performance over time!")
 
 # Configuring Authentication with Dummy Password
-names = ["User"]
-usernames = ["user"]
-credentials = {"usernames": {usernames[0]: {"name": names[0], "password": "dummy_password"}}}
+credentials = {
+    "usernames": {
+        "user": {
+            "name": "User",
+            "password": "dummy_password"
+        }
+    }
+}
+
 authenticator = Authenticate(credentials, "flexile_llama", "abcdef", cookie_expiry_days=30)
 
 # Hide Password Field
@@ -48,10 +54,8 @@ hide_password = """
 """
 st.markdown(hide_password, unsafe_allow_html=True)
 
-# Login
+# Login Handling
 name, authentication_status, username = authenticator.login(location="sidebar")
-
-# Authentication Handling
 if authentication_status:
     st.sidebar.title(f"Welcome, {name}!")
     if st.sidebar.button("Logout"):

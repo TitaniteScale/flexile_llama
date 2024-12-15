@@ -31,14 +31,17 @@ st.markdown("### Track your Fortnite performance over time!")
 # User Authentication
 from streamlit_authenticator import Authenticate
 
-# Configuring Authentication
+# Configuring Authentication (No Passwords for now)
 names = ["User"]
 usernames = ["user"]
-passwords = ["password"]  # Change to a secure method in production
-credentials = {"usernames": {usernames[0]: {"name": names[0], "password": passwords[0]}}}
+credentials = {"usernames": {usernames[0]: {"name": names[0]}}}
 authenticator = Authenticate(credentials, "flexile_llama", "abcdef", cookie_expiry_days=30)
 
-name, authentication_status, username = authenticator.login(location="sidebar")
+authentication_result = authenticator.login(location="sidebar")
+if authentication_result is not None:
+    name, authentication_status, username = authentication_result
+else:
+    name, authentication_status, username = None, None, None
 
 if authentication_status:
     st.sidebar.title(f"Welcome, {name}!")
@@ -123,9 +126,9 @@ if authentication_status:
 
 else:
     if authentication_status is False:
-        st.error("Username/password is incorrect")
+        st.error("Username is incorrect")
     elif authentication_status is None:
-        st.warning("Please enter your username and password")
+        st.warning("Please enter your username")
 
 # Close the connection
 conn.close()

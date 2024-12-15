@@ -38,7 +38,7 @@ passwords = ["password"]  # Change to a secure method in production
 credentials = {"usernames": {usernames[0]: {"name": names[0], "password": passwords[0]}}}
 authenticator = Authenticate(credentials, "flexile_llama", "abcdef", cookie_expiry_days=30)
 
-name, authentication_status, username = authenticator.login("Login", "main")
+name, authentication_status, username = authenticator.login("Login", location="sidebar")
 
 if authentication_status:
     st.sidebar.title(f"Welcome, {name}!")
